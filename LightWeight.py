@@ -1,8 +1,9 @@
-import cv2, time, pandas, json, argparse, imutils
+import cv2, time, pandas, json, argparse, imutils,dropbox,functools, operator,os ,subprocess
 from datetime import datetime
+import datetime
 from picamera.array import PiRGBArray
 from picamera import PiCamera
-
+from subprocess import Popen, PIPE 
 
 #Argument to set the min area of motion detection
 #To start python ProgramName.py -a Area  
@@ -11,24 +12,28 @@ ap.add_argument("-a", "--min-area" , type= int, default=500, help="min area size
 args = vars(ap.parse_args())
 
 
-
-
 camera = cv2.VideoCapture(-1)
 background = None
 motion = [None, None]
 time = []
 rw = PiRGBArray(camera, size=tuple([649, 480]))
-fourcc = cv2.cv.CV_FOURCC(* 'XVID')
-capper = cv2.VideoWriter('out.avi', fourcc, 20.0, (640,480))
-
-
+fourcc = cv2.VideoWriter_fourcc(* 'DIVX')
+namer = str(datetime.datetime.now()) + '.avi'
+at=dropbox.Dropbox('fvntESp0-HAAAAAAAAAAV576AiA_s3dQkDM6wcpIu-o7wLpNU9rVcA1d1rl-UGwW')
+uprev = datetime.datetime.now()
+capper = cv2.VideoWriter(namer, fourcc, 20.0, (640,480))
+dboxup = "/home/pi/Desktop/dropbox_uploader.sh upload "
+vup = "/home/pi/Desktop/tempvid/sample.text /" + namer 
+itsdone = "Motion Finished"
+#b  = open('out.avi','rb')
 #Initialization of dataframe
 df = pandas.DataFrame(columns = ["Start","Stop"])
 
 while  True:
     check, frame = camera.read()
     motion = 0
-    
+    text = "Streaming"
+    tw = datetime.datetime.now()
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (21,21), 0 )
     
@@ -50,32 +55,47 @@ while  True:
     cnts = imutils.grab_contours(cnts)
     
     for c in cnts:
-        if cv2.contourArea(c) < 10000:
+        if cv2.contourArea(c) < 5000:
             continue
         
-        motion += 1
+		# motion+=1
         (x, y, w, h) = cv2.boundingRect(c)
         cv2.rectangle(frame, (x,y) , (x+w, y+h), (255, 0, 0), 2)
         text="Motion"
-        cv2.putText(frame, "Status: {} ".format(text), (10,20), cv2.FONT_HERSHEY_PLAIN, 0.5, (0,0, 255) ,2)
+
+    ts = tw.strftime("%A %d %B %Y %I :%M:%S%p")  
+    cv2.putText(frame, "Status: {} ".format(text), (10,20), cv2.FONT_HERSHEY_PLAIN, 0.5, (0,0, 255) ,2)
         
-        if text == "Motion":
-            ret,yeet = camera.read()
+	# if text == "Motion":
+	    # if (theworld - uprev).seconds >= 60:
+		     # ret,yeet = camera.read()
+       
+		# if ret: 
+            # capper.write(yeet)
+        # # else: 
+		  
+            # # break		
+	    # # if motion == 0:
+		# # print itsdone
+	    # # os.system(dboxup + vup)
+		# else:
+	        # motion = 0
+    if text == "Motion":
+	    if(tw-uprev).seconds >= 3:
+			ret,yeet = camera.read()
             if ret: 
                 capper.write(yeet)
-            else:
-                break
-            got = "Boys we got'em"
-            cv2.putText(frame, "Status: {} ".format(got), (10,20), cv2.FONT_HERSHEY_PLAIN, 0.5, (0,0, 255) ,2)
-        else:
-            break
-            
+    # else:
+        # continue
+        # got = "Boys we got'em"
+        # cv2.putText(frame, "Status: {} ".format(got), (10,20), cv2.FONT_HERSHEY_PLAIN, 0.5, (0,0, 255) ,2)
 
 
     cv2.imshow("Camera Stream", frame)
     cv2.waitKey(1)
     
-    
+print motion 
+
 camera.release()
 capper.release()
 cv2.destoryAllWindows()
