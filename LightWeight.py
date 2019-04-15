@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import cv2, time, pandas, json, argparse, imutils,dropbox,functools, operator,os ,subprocess
 from datetime import datetime
 import datetime
@@ -11,6 +13,8 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-a", "--min-area" , type= int, default=500, help="min area size")
 args = vars(ap.parse_args())
 
+
+stillFrameCounter=0
 
 camera = cv2.VideoCapture(-1)
 background = None
@@ -66,6 +70,7 @@ while  True:
         motionDetected = True
         text="Motion"
         print "Motion Detected."
+        stillFrameCounter=0
 
     ts = tw.strftime("%A %d %B %Y %I :%M:%S%p")  
     cv2.putText(frame, "Status: {} ".format(text), (10,20), cv2.FONT_HERSHEY_PLAIN, 0.5, (0,0, 255) ,2)
@@ -91,9 +96,11 @@ while  True:
             if ret: 
                 capper.write(frame2)
     else:
-        print "Releasing capper."
-        #capper.release()
-        #capper = cv2.VideoWriter(name, fourcc, 20.0, (640,480))
+        stillFrameCounter = stillFrameCounter + 1
+        if(stillFrameCounter > 500):
+            print "Releasing capper."
+            capper.release()
+            capper = cv2.VideoWriter(name, fourcc, 20.0, (640,480))
         
     # else:
         # continue
