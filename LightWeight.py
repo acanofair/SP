@@ -23,7 +23,7 @@ at=dropbox.Dropbox('fvntESp0-HAAAAAAAAAAV576AiA_s3dQkDM6wcpIu-o7wLpNU9rVcA1d1rl-
 uprev = datetime.datetime.now()
 capper = cv2.VideoWriter(name, fourcc, 20.0, (640,480))
 dboxup = "/home/pi/Desktop/dropbox_uploader.sh upload "
-vup = "/home/pi/Desktop/tempvid/sample.text /" + namer 
+vup = "/home/pi/Desktop/tempvid/sample.text /" + name
 itsdone = "Motion Finished"
 #b  = open('out.avi','rb')
 #Initialization of dataframe
@@ -89,7 +89,7 @@ while  True:
                 capper.write(frame2)
     else:
     	capper.release()
-    	capper = cv2.VideoWriter(namer, fourcc, 20.0, (640,480))
+    	capper = cv2.VideoWriter(name, fourcc, 20.0, (640,480))
     	
     # else:
         # continue
