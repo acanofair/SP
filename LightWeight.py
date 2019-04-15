@@ -60,7 +60,7 @@ while  True:
         if cv2.contourArea(c) < 5000:
             continue
         
-		# motion+=1
+        # motion+=1
         (x, y, w, h) = cv2.boundingRect(c)
         cv2.rectangle(frame, (x,y) , (x+w, y+h), (255, 0, 0), 2)
         motionDetected = True
@@ -70,31 +70,31 @@ while  True:
     ts = tw.strftime("%A %d %B %Y %I :%M:%S%p")  
     cv2.putText(frame, "Status: {} ".format(text), (10,20), cv2.FONT_HERSHEY_PLAIN, 0.5, (0,0, 255) ,2)
         
-	# if text == "Motion":
-	    # if (theworld - uprev).seconds >= 60:
-		     # ret,yeet = camera.read()
+    # if text == "Motion":
+        # if (theworld - uprev).seconds >= 60:
+             # ret,yeet = camera.read()
        
-		# if ret: 
+        # if ret: 
             # capper.write(yeet)
         # # else: 
-		  
-            # # break		
-	    # # if motion == 0:
-		# # print itsdone
-	    # # os.system(dboxup + vup)
-		# else:
-	        # motion = 0
+          
+            # # break       
+        # # if motion == 0:
+        # # print itsdone
+        # # os.system(dboxup + vup)
+        # else:
+            # motion = 0
     if motionDetected:
         ret = False
         if(tw - uprev).seconds >= 3:
-	    	ret,frame2 = camera.read()
+            ret,frame2 = camera.read()
             if ret: 
                 capper.write(frame2)
     else:
         print "Releasing capper."
-    	#capper.release()
-    	#capper = cv2.VideoWriter(name, fourcc, 20.0, (640,480))
-    	
+        #capper.release()
+        #capper = cv2.VideoWriter(name, fourcc, 20.0, (640,480))
+        
     # else:
         # continue
         # got = "Boys we got'em"
