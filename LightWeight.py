@@ -4,7 +4,7 @@ import datetime
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 from subprocess import Popen, PIPE 
-
+    
 #Argument to set the min area of motion detection
 #To start python ProgramName.py -a Area  
 ap = argparse.ArgumentParser()
@@ -30,6 +30,7 @@ itsdone = "Motion Finished"
 df = pandas.DataFrame(columns = ["Start","Stop"])
 
 while  True:
+    print "Running: top of loop."
     check, frame = camera.read()
     motion = 0
     text = "Streaming"
@@ -53,7 +54,7 @@ while  True:
     
     cnts = cv2.findContours(tf.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
-    motionDetected = false
+    motionDetected = False
     
     for c in cnts:
         if cv2.contourArea(c) < 5000:
@@ -62,8 +63,9 @@ while  True:
 		# motion+=1
         (x, y, w, h) = cv2.boundingRect(c)
         cv2.rectangle(frame, (x,y) , (x+w, y+h), (255, 0, 0), 2)
-        motionDetected = true
+        motionDetected = True
         text="Motion"
+        print "Motion Detected."
 
     ts = tw.strftime("%A %d %B %Y %I :%M:%S%p")  
     cv2.putText(frame, "Status: {} ".format(text), (10,20), cv2.FONT_HERSHEY_PLAIN, 0.5, (0,0, 255) ,2)
@@ -83,13 +85,15 @@ while  True:
 		# else:
 	        # motion = 0
     if motionDetected:
-	    if(tw - uprev).seconds >= 3:
-			ret,frame2 = camera.read()
+        ret = False
+        if(tw - uprev).seconds >= 3:
+	    	ret,frame2 = camera.read()
             if ret: 
                 capper.write(frame2)
     else:
-    	capper.release()
-    	capper = cv2.VideoWriter(name, fourcc, 20.0, (640,480))
+        print "Releasing capper."
+    	#capper.release()
+    	#capper = cv2.VideoWriter(name, fourcc, 20.0, (640,480))
     	
     # else:
         # continue
@@ -97,11 +101,11 @@ while  True:
         # cv2.putText(frame, "Status: {} ".format(got), (10,20), cv2.FONT_HERSHEY_PLAIN, 0.5, (0,0, 255) ,2)
 
 
-    cv2.imshow("Camera Stream", frame)
+#    cv2.imshow("Camera Stream", frame)
     cv2.waitKey(1)
     
 print motion 
 
 camera.release()
 capper.release()
-cv2.destoryAllWindows()
+cv2.destroyAllWindows()
