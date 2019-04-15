@@ -18,10 +18,10 @@ motion = [None, None]
 time = []
 rw = PiRGBArray(camera, size=tuple([649, 480]))
 fourcc = cv2.VideoWriter_fourcc(* 'DIVX')
-namer = str(datetime.datetime.now()) + '.avi'
+name = str(datetime.datetime.now()) + '.avi'
 at=dropbox.Dropbox('fvntESp0-HAAAAAAAAAAV576AiA_s3dQkDM6wcpIu-o7wLpNU9rVcA1d1rl-UGwW')
 uprev = datetime.datetime.now()
-capper = cv2.VideoWriter(namer, fourcc, 20.0, (640,480))
+capper = cv2.VideoWriter(name, fourcc, 20.0, (640,480))
 dboxup = "/home/pi/Desktop/dropbox_uploader.sh upload "
 vup = "/home/pi/Desktop/tempvid/sample.text /" + namer 
 itsdone = "Motion Finished"
@@ -53,6 +53,7 @@ while  True:
     
     cnts = cv2.findContours(tf.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
+    motionDetected = false
     
     for c in cnts:
         if cv2.contourArea(c) < 5000:
@@ -61,6 +62,7 @@ while  True:
 		# motion+=1
         (x, y, w, h) = cv2.boundingRect(c)
         cv2.rectangle(frame, (x,y) , (x+w, y+h), (255, 0, 0), 2)
+        motionDetected = true
         text="Motion"
 
     ts = tw.strftime("%A %d %B %Y %I :%M:%S%p")  
@@ -80,11 +82,15 @@ while  True:
 	    # # os.system(dboxup + vup)
 		# else:
 	        # motion = 0
-    if text == "Motion":
-	    if(tw-uprev).seconds >= 3:
-			ret,yeet = camera.read()
+    if motionDetected:
+	    if(tw - uprev).seconds >= 3:
+			ret,frame2 = camera.read()
             if ret: 
-                capper.write(yeet)
+                capper.write(frame2)
+    else:
+    	capper.release()
+    	capper = cv2.VideoWriter(namer, fourcc, 20.0, (640,480))
+    	
     # else:
         # continue
         # got = "Boys we got'em"
